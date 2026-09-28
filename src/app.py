@@ -11,6 +11,7 @@ from src.api.routes_risk import router as risk_router
 from src.api.routes_incidents import router as incidents_router
 from src.api.routes_ai import router as ai_router
 from src.api.routes_simulations import router as simulations_router
+from src.api.routes_host import router as host_router
 from src.api.websocket import router as ws_router
 
 def create_app() -> FastAPI:
@@ -38,6 +39,7 @@ def create_app() -> FastAPI:
     app.include_router(incidents_router)
     app.include_router(ai_router)
     app.include_router(simulations_router)
+    app.include_router(host_router)
     app.include_router(ws_router)
 
     # Static files & UI Mount

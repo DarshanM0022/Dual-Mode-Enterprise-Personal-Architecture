@@ -156,6 +156,27 @@ function showToast(message, type = 'info') {
     }, 4000);
 }
 
+// Real Local Host Audit
+async function runRealHostAudit() {
+    showToast("Auditing live Windows endpoint (Defender, ports, processes, event logs)...", "info");
+    try {
+        const res = await fetch('/api/host/audit', { method: 'POST' });
+        const data = await res.json();
+        if (res.ok) {
+            showToast(`Real Host ${data.hostname} Audited! Real Risk: ${data.real_risk_score}/100. ${data.real_events_ingested_to_siem} live events ingested to SIEM.`, "success");
+            if (window.loadSIEMEvents) window.loadSIEMEvents();
+            if (window.loadPersonalSecurity) window.loadPersonalSecurity();
+            if (window.renderEntityGraph) window.renderEntityGraph();
+            if (window.fetchPlatformMetrics) window.fetchPlatformMetrics();
+        } else {
+            showToast("Failed to audit real host", "error");
+        }
+    } catch (e) {
+        showToast("Error connecting to host collector", "error");
+    }
+}
+window.runRealHostAudit = runRealHostAudit;
+
 // Initialization on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
     initWebSocket();
