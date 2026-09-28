@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aetheris: A Beginner's Guide to Modern Cybersecurity Architecture</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+        @page {
+            size: A4;
+            margin: 14mm 14mm 14mm 14mm;
+            @bottom-right {
+                content: counter(page);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            color: #1e293b;
+            background-color: #ffffff;
+            line-height: 1.45;
+            font-size: 10pt;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, h2, h3, h4 {
+            color: #0f172a;
+            font-weight: 700;
+            margin-top: 0;
+        }
+
+        .page {
+            page-break-after: always;
+            position: relative;
+            min-height: 250mm;
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        /* Cover Page */
+        .cover-page {
+            background: linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e1b4b 100%);
+            color: #f8fafc;
+            padding: 60px 40px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 255mm;
+        }
+
+        .cover-badge {
+            display: inline-block;
+            background: rgba(6, 182, 212, 0.15);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 9pt;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .cover-title {
+            font-size: 32pt;
+            font-weight: 800;
+            line-height: 1.15;
+            color: #ffffff;
+            margin: 20px 0 12px 0;
+        }
+
+        .cover-title span {
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cover-subtitle {
+            font-size: 14pt;
+            color: #94a3b8;
+            font-weight: 400;
+            line-height: 1.5;
+            max-width: 580px;
+        }
+
+        .cover-meta {
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+            padding-top: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            font-size: 9pt;
+            color: #cbd5e1;
+        }
+
+        .cover-meta strong {
+            color: #ffffff;
+            display: block;
+            font-size: 10pt;
+            margin-bottom: 2px;
+        }
+
+        /* Typography & Layout */
+        .section-header {
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+        }
+
+        .section-header h2 {
+            font-size: 16pt;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .section-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8.5pt;
+            font-weight: 600;
+            color: #0284c7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        p {
+            margin: 0 0 12px 0;
+        }
+
+        /* Analogy Card Boxes */
+        .card-analogy {
+            background: #f8fafc;
+            border-left: 4px solid #0284c7;
+            border-top: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px;
+            margin: 16px 0;
+        }
+
+        .card-analogy .title {
+            font-weight: 700;
+            color: #0369a1;
+            font-size: 10pt;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .highlight-box {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 14px;
+            margin: 14px 0;
+        }
+
+        .card-danger {
+            background: #fff1f2;
+            border-left: 4px solid #f43f5e;
+            border-top: 1px solid #fecdd3;
+            border-right: 1px solid #fecdd3;
+            border-bottom: 1px solid #fecdd3;
+            border-radius: 0 8px 8px 0;
+            padding: 12px 16px;
+            margin: 12px 0;
+        }
+
+        .card-success {
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+            border-top: 1px solid #bbf7d0;
+            border-right: 1px solid #bbf7d0;
+            border-bottom: 1px solid #bbf7d0;
+            border-radius: 0 8px 8px 0;
+            padding: 12px 16px;
+            margin: 12px 0;
+        }
+
+        /* Grids & Cards */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 14px 0;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .feature-card h4 {
+            margin: 0 0 6px 0;
+            font-size: 11pt;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Step by Step Timeline */
+        .timeline-step {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #0284c7;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 9.5pt;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content strong {
+            color: #0f172a;
+            font-size: 10.5pt;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9.5pt;
+            margin: 14px 0;
+        }
+
+        th {
+            background-color: #0f172a;
+            color: #ffffff;
+            text-align: left;
+            padding: 8px 12px;
+            font-weight: 600;
+            font-size: 9pt;
+        }
+
+        td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8.5pt;
+            background: #e2e8f0;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #0f172a;
+        }
+
+        .footer-note {
+            font-size: 8pt;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 8px;
+            margin-top: 24px;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= PAGE 1: COVER PAGE ================= -->
+    <div class="page">
+        <div class="cover-page">
+            <div>
+                <span class="cover-badge">Cybersecurity Architecture Primer</span>
+                <h1 class="cover-title">How Modern Cyber Defense<br><span>Actually Works</span></h1>
+                <p class="cover-subtitle">
+                    A beginner-friendly, plain-English breakdown of enterprise security, explainable risk, real-time threat detection, and AI copilot guardrails through the <strong>Aetheris Platform</strong>.
+                </p>
+            </div>
+
+            <div>
+                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+                    <div style="font-size: 11pt; font-weight: 600; color: #38bdf8; margin-bottom: 6px;">💡 The Core Idea in 10 Seconds:</div>
+                    <div style="font-size: 9.5pt; line-height: 1.6; color: #e2e8f0;">
+                        Traditional antivirus only checks files. Modern cybersecurity platforms act like an <strong>intelligent air traffic control tower</strong>: they continuously watch logins, computers, networks, and files, connect the dots between subtle clues, calculate explainable risk scores, and stop hackers automatically before damage occurs.
+                    </div>
+                </div>
+
+                <div class="cover-meta">
+                    <div>
+                        <strong>Platform Reference</strong>
+                        Aetheris Unified Adaptive Security (v1.0-Enterprise)
+                    </div>
+                    <div>
+                        <strong>Target Audience</strong>
+                        Beginners, Students, Non-Technical Leaders & Evaluators
+                    </div>
+                    <div>
+                        <strong>Author / Architect</strong>
+                        Darsh Sharma
+                    </div>
+                    <div>
+                        <strong>Repository</strong>
+                        github.com/DarshanM0022/Dual-Mode-Enterprise-Personal-Architecture
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 2: THE REAL WORLD ANALOGY ================= -->
+    <div class="page">
+        <div class="section-header">
+            <h2>1. The Big Picture: What Does Cybersecurity Really Do?</h2>
+            <span class="section-tag">Concept & Analogy</span>
+        </div>
+
+        <p>
+            If you are new to cybersecurity, you might think of it as simply installing an antivirus app like McAfee or Norton that scans your computer for viruses.
+        </p>
+        <p>
+            In the real world of companies, banks, and modern cloud services, <strong>antivirus alone is almost useless</strong>. Why? Because modern hackers don't just email a virus named <code>virus.exe</code>. Instead, they steal real passwords, disguise themselves as employees, and abuse legitimate system tools.
+        </p>
+
+        <div class="card-analogy">
+            <div class="title">🏦 The Bank Heist Analogy: Old vs. New Security</div>
+            <p style="margin: 0; font-size: 9.5pt;">
+                <strong>The Old Way (Basic Antivirus):</strong> You put a sturdy lock on the bank's front door. If someone breaks a window, you might notice. But if a criminal puts on an employee uniform and unlocks the front door with a stolen key, your lock does nothing. The criminal walks right into the vault.
+                <br><br>
+                <strong>The Modern Way (Aetheris Adaptive Security):</strong> You have security cameras everywhere. You track who entered, what room they walked into, what time it is, and what they are touching. When "Bob" unlocks the front door at 3:15 AM on Sunday, and immediately opens the master cash safe, the system recognizes that Bob <em>never</em> works at night and doesn't normally open that safe. The emergency alarm triggers, the vault doors lock automatically, and security guards are alerted.
+            </p>
+        </div>
+
+        <h3 style="margin-top: 24px; font-size: 13pt;">The 4 Basic Questions of Cybersecurity</h3>
+        <p>Every modern security platform exists to answer four fundamental questions in real time:</p>
+
+        <div class="grid-2">
+            <div class="feature-card">
+                <h4>👀 1. Who is doing what?</h4>
+                <p style="font-size: 9pt; color: #475569; margin: 0;">
+                    Monitoring logins, file downloads, program executions, and network connections across all devices simultaneously.
+                </p>
+            </div>
+            <div class="feature-card">
+                <h4>🧠 2. Is this normal?</h4>
+                <p style="font-size: 9pt; color: #475569; margin: 0;">
+                    Comparing current activity against historical baseline routines to spot weird behavior (UEBA).
+                </p>
+            </div>
+            <div class="feature-card">
+                <h4>⚖️ 3. How dangerous is this?</h4>
+                <p style="font-size: 9pt; color: #475569; margin: 0;">
+                    Calculating a fair, mathematically explainable risk score (0 to 100) instead of crying wolf on every tiny alert.
+                </p>
+            </div>
+            <div class="feature-card">
+                <h4>🛡️ 4. What should we do right now?</h4>
+                <p style="font-size: 9pt; color: #475569; margin: 0;">
+                    Recommending and safely executing containment playbooks (like isolating an infected laptop) to stop the spread.
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <span>Aetheris Security Platform — Architectural Primer</span>
+            <span>Page 2</span>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 3: THE 7 SUPERPOWERS EXPLAINED ================= -->
+    <div class="page">
+        <div class="section-header">
+            <h2>2. The Seven Superpowers of Aetheris</h2>
+            <span class="section-tag">Architecture</span>
+        </div>
+
+        <p>
+            In technical terms, Aetheris is divided into <strong>seven planes</strong>. Here is what each plane does in everyday language:
+        </p>
+
+        <div class="feature-card" style="margin-bottom: 8px; border-left: 4px solid #0284c7; padding: 10px 14px;">
+            <h4>1. The Universal Translator (Common Event Model / Ingestion)</h4>
+            <p style="font-size: 8.5pt; margin: 0; color: #475569;">
+                <strong>The Problem:</strong> Windows logs in weird error codes (e.g. <code>Event ID 4624</code>), AWS Cloud logs in JSON (<code>ConsoleLogin</code>), and firewalls log in raw network packet bytes. It's like having 10 witnesses speaking 10 different foreign languages.<br>
+                <strong>The Solution:</strong> Aetheris translates every incoming log into a standard format: <em>Who did it? From what device? To what target? Did it succeed?</em> Now all detection rules work everywhere.
+            </p>
+        </div>
+
+        <div class="feature-card" style="margin-bottom: 8px; border-left: 4px solid #8b5cf6; padding: 10px 14px;">
+            <h4>2. The Three-Layer Detective (Rules, Correlation & Behavior)</h4>
+            <p style="font-size: 8.5pt; margin: 0; color: #475569;">
+                <strong>Layer A (Rules):</strong> Simple tripwires. Example: <em>If someone enters the wrong password 5 times in a row, flag it.</em><br>
+                <strong>Layer B (Stateful Correlation):</strong> Connecting the dots across time. 1 password failure is fine. But 5 failures + 1 success + a strange Russian IP address + downloading financial records = <em>A coordinated cyber attack.</em><br>
+                <strong>Layer C (Behavioral Baseline / UEBA):</strong> The system learns each person's normal schedule. If a user who works 9am-5pm suddenly logs in at 3am from a new unmanaged laptop, the system flags a behavioral anomaly without guessing.
+            </p>
+        </div>
+
+        <div class="feature-card" style="margin-bottom: 8px; border-left: 4px solid #10b981; padding: 10px 14px;">
+            <h4>3. The Doctor's Diagnosis (Explainable Risk Engine)</h4>
+            <p style="font-size: 8.5pt; margin: 0; color: #475569;">
+                Most security tools give a mysterious score like "Risk: 78" without telling you why. Aetheris acts like a transparent doctor: it explicitly shows you: <em>"Risk is 78/100 because Elena logged in from Moscow 14 minutes after New York (+35 pts), used an unpatched laptop (+25 pts), and accessed sensitive accounting ledgers (+18 pts)."</em>
+            </p>
+        </div>
+
+        <div class="feature-card" style="margin-bottom: 8px; border-left: 4px solid #f59e0b; padding: 10px 14px;">
+            <h4>4. The Contagion Map (Entity Graph & Blast Radius)</h4>
+            <p style="font-size: 8.5pt; margin: 0; color: #475569;">
+                Draws an interactive spiderweb connecting every User, Laptop, Server, and Database. If a laptop gets hacked, Aetheris instantly calculates its <strong>Blast Radius</strong>: <em>What other servers or databases can the hacker reach from this machine in 2 hops?</em>
+            </p>
+        </div>
+
+        <div class="feature-card" style="margin-bottom: 8px; border-left: 4px solid #f43f5e; padding: 10px 14px;">
+            <h4>5. The Automatic Fire Doors (Incident Response & SOAR)</h4>
+            <p style="font-size: 8.5pt; margin: 0; color: #475569;">
+                When a building catches fire, automated fire doors slam shut to trap the smoke. Aetheris has digital fire doors: with one click, analysts can <strong>Isolate the Laptop</strong> (disconnect it from Wi-Fi so ransomware can't spread) or <strong>Revoke User Sessions</strong> (kick the hacker out).
+            </p>
+        </div>
+
+        <div class="feature-card" style="border-left: 4px solid #6366f1; padding: 10px 14px;">
+            <h4>6. The Guardrailed AI Copilot (The Safe Assistant)</h4>
+            <p style="font-size: 8.5pt; margin: 0; color: #475569;">
+                An intelligent security chatbot that can answer questions like <em>"Why is Elena high risk?"</em>. But critically, <strong>the AI is guardrailed</strong>: it can read clues and investigate, but it is physically prevented from shutting down servers without human approval.
+            </p>
+        </div>
+
+        <div class="footer-note">
+            <span>Aetheris Security Platform — Architectural Primer</span>
+            <span>Page 3</span>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 4: WALKTHROUGH OF A REAL ATTACK ================= -->
+    <div class="page">
+        <div class="section-header">
+            <h2>3. Step-by-Step Story: Anatomy of a Cyber Attack</h2>
+            <span class="section-tag">Case Study</span>
+        </div>
+
+        <p>
+            To understand how all these pieces work together, let's walk through an attack scenario built into Aetheris: <strong>The Compromise of Elena Rostova (VP of Finance)</strong>.
+        </p>
+
+        <div class="timeline-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+                <strong>03:10 AM — Password Guessing (Credential Stuffing)</strong>
+                <p style="font-size: 9pt; color: #475569; margin-top: 2px;">
+                    An attacker in Romania uses an automated script to try leaked passwords against Elena's email account. The system records 5 failed logins within 60 seconds.
+                    <br><span style="color: #0284c7; font-weight: 600;">Detection:</span> <code>RULE-AUTH-001 (Brute-Force Alert)</code> triggers.
+                </p>
+            </div>
+        </div>
+
+        <div class="timeline-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+                <strong>03:12 AM — The Successful Login & Weak 2FA</strong>
+                <p style="font-size: 9pt; color: #475569; margin-top: 2px;">
+                    The attacker finds the right password. Elena's account used basic SMS text message 2FA, which the hacker intercepted via SIM swap. The attacker enters the code and logs in.
+                </p>
+            </div>
+        </div>
+
+        <div class="timeline-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+                <strong>03:14 AM — Impossible Travel Detected</strong>
+                <p style="font-size: 9pt; color: #475569; margin-top: 2px;">
+                    Elena's legitimate laptop was active in New York 14 minutes ago. Now, a login succeeds from a computer in Moscow. It is physically impossible to fly from NYC to Moscow in 14 minutes (that would require flying at 4,800 miles per hour!).
+                    <br><span style="color: #ea580c; font-weight: 600;">Detection:</span> <code>RULE-IDP-004 (Impossible Travel)</code> triggers.
+                </p>
+            </div>
+        </div>
+
+        <div class="timeline-step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+                <strong>03:17 AM — Behavioral Anomaly (UEBA)</strong>
+                <p style="font-size: 9pt; color: #475569; margin-top: 2px;">
+                    Elena normally works Monday to Friday, 9:00 AM to 5:00 PM EST. Her login at 3:17 AM is 3.4 standard deviations away from her normal routine ($Z > 2.5$). Additionally, the attacker is using an unmanaged Kali Linux laptop without company security certificates.
+                    <br><span style="color: #dc2626; font-weight: 600;">Detection:</span> <code>UEBA-ANOMALY-001 (Statistical Deviation)</code> triggers.
+                </p>
+            </div>
+        </div>
+
+        <div class="timeline-step">
+            <div class="step-num">5</div>
+            <div class="step-content">
+                <strong>03:20 AM — Incident Created & Risk Escalated to 85% (CRITICAL)</strong>
+                <p style="font-size: 9pt; color: #475569; margin-top: 2px;">
+                    The <strong>Correlation Engine</strong> links the brute-force, impossible travel, and behavioral alerts together. It synthesizes Incident <code>INC-CRIT-901</code> and escalates Elena's risk to 85/100.
+                </p>
+            </div>
+        </div>
+
+        <div class="timeline-step">
+            <div class="step-num">6</div>
+            <div class="step-content">
+                <strong>03:21 AM — Safe Containment via SOAR & Human Approval</strong>
+                <p style="font-size: 9pt; color: #475569; margin-top: 2px;">
+                    The AI Copilot recommends two containment actions: (1) <code>REVOKE_SESSION</code> (kick the hacker out) and (2) <code>BLOCK_IP</code> (blacklist the attacker's IP on firewalls). Because these actions have high impact, the system generates an approval card. The security analyst clicks <strong>[Authorize & Execute]</strong>. The attack is terminated within minutes!
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <span>Aetheris Security Platform — Architectural Primer</span>
+            <span>Page 4</span>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 5: DUAL-MODE (ENTERPRISE + PERSONAL) ================= -->
+    <div class="page">
+        <div class="section-header">
+            <h2>4. Dual-Mode Architecture: Enterprise vs. Personal</h2>
+            <span class="section-tag">Innovation</span>
+        </div>
+
+        <p>
+            One of the most unique aspects of Aetheris is its <strong>Dual-Mode capability</strong>. Traditional enterprise security tools (like Splunk or SentinelOne) are so complex that ordinary people cannot use them.
+        </p>
+        <p>
+            Aetheris uses the <strong>exact same powerful core engine</strong> to protect both large companies and personal households:
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Feature</th>
+                    <th style="width: 37%;">Enterprise Mode (SOC Analyst / CISO)</th>
+                    <th style="width: 38%;">Personal Security Mode (Home User)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>User Interface</strong></td>
+                    <td>Dense, technical dark-mode dashboard with live SIEM feeds, MITRE tactics, and code tables.</td>
+                    <td>Friendly, clean interface with a simple Health Score gauge (e.g. <em>"78% - Good Posture"</em>).</td>
+                </tr>
+                <tr>
+                    <td><strong>Identity Security</strong></td>
+                    <td>Auditing Okta, Azure Entra ID, domain admin privileges, and service accounts.</td>
+                    <td>Monitoring personal email for dark web password breaches and enforcing Passkeys.</td>
+                </tr>
+                <tr>
+                    <td><strong>Device Security</strong></td>
+                    <td>Fleet compliance, BitLocker enforcement, EDR agent heartbeats across 10,000 laptops.</td>
+                    <td>Checking if your home laptop and iPhone are up to date with disk encryption enabled.</td>
+                </tr>
+                <tr>
+                    <td><strong>Exposure & Privacy</strong></td>
+                    <td>Scanning public AWS S3 buckets, exposed ports (RDP 3389), and leaked GitHub tokens.</td>
+                    <td>Reviewing third-party app permissions (e.g. a quiz app having full Google Drive access).</td>
+                </tr>
+                <tr>
+                    <td><strong>Response Action</strong></td>
+                    <td>Network isolation via EDR firewall rules; perimeter IP blocklists.</td>
+                    <td>One-click <em>[Resolve & Secure]</em> wizard to rotate compromised passwords and revoke OAuth grants.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="card-success">
+            <div style="font-weight: 700; color: #166534; font-size: 10pt; margin-bottom: 3px;">✅ Why this is a Breakthrough:</div>
+            <p style="margin: 0; font-size: 9pt; color: #15803d;">
+                You don't need two completely different security architectures. By maintaining clean tenant boundaries (<code>tenant-corp-acme</code> vs. <code>tenant-personal-darsh</code>), the same mathematical risk model protects cloud servers by day and personal families by night.
+            </p>
+        </div>
+
+        <h3 style="margin-top: 22px; font-size: 13pt;">Real Host Telemetry (Tested on Physical Hardware)</h3>
+        <p>
+            Unlike school projects that use fake mocked data, Aetheris was audited and tested directly against a real physical Windows workstation (<code>DEMOICDRAGON</code>, user <code>darsh</code>):
+        </p>
+        <ul style="font-size: 9pt; color: #475569; padding-left: 20px;">
+            <li><strong>Microsoft Defender Status:</strong> Real-time protection queried directly via PowerShell (Active).</li>
+            <li><strong>Port Vulnerabilities:</strong> Detected real open network sockets on local ports 445 (SMB) and 135 (RPC).</li>
+            <li><strong>Live OS Logs:</strong> Captured real Windows System Event logs and ingested them into the SIEM pipeline.</li>
+        </ul>
+
+        <div class="footer-note">
+            <span>Aetheris Security Platform — Architectural Primer</span>
+            <span>Page 5</span>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 6: GLOSSARY & CONCLUSION ================= -->
+    <div class="page">
+        <div class="section-header">
+            <h2>5. Cybersecurity Glossary for Beginners</h2>
+            <span class="section-tag">Reference Guide</span>
+        </div>
+
+        <p>Keep this quick cheat-sheet handy whenever you hear cybersecurity acronyms:</p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px;">
+            <div class="feature-card">
+                <strong>SIEM (Security Information & Event Management)</strong>
+                <p style="font-size: 8.5pt; color: #475569; margin: 3px 0 0 0;">
+                    A central digital log warehouse that collects, organizes, and searches event records from all computers and servers.
+                </p>
+            </div>
+            <div class="feature-card">
+                <strong>EDR (Endpoint Detection & Response)</strong>
+                <p style="font-size: 8.5pt; color: #475569; margin: 3px 0 0 0;">
+                    Software installed directly on individual laptops and servers that watches running programs and can isolate an infected computer.
+                </p>
+            </div>
+            <div class="feature-card">
+                <strong>SOAR (Security Orchestration, Automation & Response)</strong>
+                <p style="font-size: 8.5pt; color: #475569; margin: 3px 0 0 0;">
+                    Automated playbooks that take immediate action when an attack happens (e.g. automatically locking an account or blocking an IP).
+                </p>
+            </div>
+            <div class="feature-card">
+                <strong>UEBA (User & Entity Behavioral Analytics)</strong>
+                <p style="font-size: 8.5pt; color: #475569; margin: 3px 0 0 0;">
+                    Using statistical math and machine learning to learn normal human routines and flag abnormal deviations.
+                </p>
+            </div>
+            <div class="feature-card">
+                <strong>Blast Radius</strong>
+                <p style="font-size: 8.5pt; color: #475569; margin: 3px 0 0 0;">
+                    The total number of connected computers, accounts, and databases that a hacker could potentially access if one device is breached.
+                </p>
+            </div>
+            <div class="feature-card">
+                <strong>Zero Trust</strong>
+                <p style="font-size: 8.5pt; color: #475569; margin: 3px 0 0 0;">
+                    A security philosophy that means: <em>"Never trust, always verify."</em> Just because someone is on the company Wi-Fi doesn't mean they are safe.
+                </p>
+            </div>
+        </div>
+
+        <div class="highlight-box" style="margin-top: 24px;">
+            <div style="font-weight: 700; color: #0f172a; font-size: 11pt; margin-bottom: 6px;">🎯 Summary: How to Present This Project</div>
+            <p style="font-size: 9pt; color: #334155; margin: 0; line-height: 1.6;">
+                When explaining Aetheris to anyone, summarize it in three simple sentences:<br>
+                1. <strong>"We collect signals from everywhere</strong> (logins, laptops, firewalls) and translate them into one language."<br>
+                2. <strong>"We use math and behavioral analysis</strong> to connect the dots and explain <em>why</em> a threat is dangerous, instead of giving a mystery number."<br>
+                3. <strong>"We use an AI Copilot with strict guardrails</strong> and automated response doors to neutralize threats in minutes—whether for a Fortune 500 company or a personal laptop."
+            </p>
+        </div>
+
+        <div style="margin-top: 30px; text-align: center; font-size: 9pt; color: #64748b;">
+            Project Repository: <a href="https://github.com/DarshanM0022/Dual-Mode-Enterprise-Personal-Architecture" style="color: #0284c7; text-decoration: none; font-weight: 600;">github.com/DarshanM0022/Dual-Mode-Enterprise-Personal-Architecture</a>
+        </div>
+
+        <div class="footer-note">
+            <span>Aetheris Security Platform — Architectural Primer</span>
+            <span>Page 6</span>
+        </div>
+    </div>
+
+</body>
+</html>
