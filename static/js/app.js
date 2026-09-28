@@ -181,5 +181,21 @@ window.runRealHostAudit = runRealHostAudit;
 document.addEventListener('DOMContentLoaded', () => {
     initWebSocket();
     fetchPlatformMetrics();
-    switchPerspective('analyst');
+    
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get('mode') || 'analyst';
+    switchPerspective(mode);
+
+    if (params.get('drawer') === 'ai') {
+        setTimeout(() => {
+            if (window.toggleAICopilot) window.toggleAICopilot(true);
+            if (window.submitAICopilotMessage) window.submitAICopilotMessage('Why is Elena Rostova high risk?');
+        }, 600);
+    }
+
+    if (params.get('incident')) {
+        setTimeout(() => {
+            if (window.openIncidentDetails) window.openIncidentDetails(params.get('incident'));
+        }, 600);
+    }
 });

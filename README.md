@@ -105,15 +105,36 @@ $$\text{User} \longleftrightarrow \text{Device} \longleftrightarrow \text{Accoun
 
 ---
 
-## 3. Tri-Perspective UI/UX
+## 3. Visual Proof of Content (Live System Screenshots)
 
-1. **🛡️ SOC Analyst Mode**: Mission control, live WebSocket SIEM stream, Vis.js graph, incident triage, and 1-click live attack benchmark triggers.
-2. **👤 Personal Security Mode**: Consumer-friendly health score (e.g., 84%), leaked password alerts, personal devices, and 1-click privacy remediation.
+> **Note**: These screenshots are authentic, unedited captures from the live platform executing on the physical Windows workstation. Detailed architectural breakdowns are documented in [**`PROOF_OF_CONTENT.md`**](PROOF_OF_CONTENT.md).
+
+### 🛡️ SOC Analyst Mission Control & Attack Graph
+![SOC Analyst Dashboard](docs/screenshots/01_soc_analyst_dashboard.png)
+
+### 👤 Personal Security Center (Dual-Mode Architecture)
+![Personal Security Center](docs/screenshots/02_personal_security_center.png)
+
+### 📈 CISO Executive Posture & Compliance
+![CISO Executive Posture](docs/screenshots/03_ciso_executive_posture.png)
+
+### 🤖 Guardrailed AI Security Copilot
+![AI Copilot Drawer](docs/screenshots/04_ai_copilot_drawer.png)
+
+### ⚡ Incident Triage & SOAR Playbooks
+![Incident Triage Modal](docs/screenshots/05_incident_triage_modal.png)
+
+---
+
+## 4. Tri-Perspective UI/UX
+
+1. **🛡️ SOC Analyst Mode**: Mission control, live WebSocket SIEM stream, Vis.js graph, incident triage, live local Windows host auditing, and 1-click live attack benchmark triggers.
+2. **👤 Personal Security Mode**: Consumer-friendly health score (e.g., 78%), leaked password alerts, personal devices, and 1-click privacy remediation.
 3. **📈 CISO Executive Mode**: Strategic posture, MTTD/MTTR KPIs, 30-day risk trajectory charts, and NIST/ISO/SOC2 compliance audit gauges.
 
 ---
 
-## 4. Running the Platform
+## 5. Running the Platform
 
 ### Prerequisites
 - Python 3.10+ (tested on Python 3.12)
