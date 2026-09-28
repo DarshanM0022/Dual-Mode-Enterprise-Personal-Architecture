@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aetheris — Unified Adaptive Security Platform</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            950: '#060911',
+                            900: '#0b1120',
+                            800: '#151f32',
+                            700: '#1e293b',
+                            cyan: '#06b6d4',
+                            rose: '#f43f5e',
+                            emerald: '#10b981',
+                            amber: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Vis.js Network Graph -->
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/custom.css">
+</head>
+<body class="bg-cyber-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-white">
+
+    <!-- Top Navigation Bar -->
+    <header class="h-16 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40 px-6 flex items-center justify-between">
+        <!-- Logo & Insignia -->
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-cyan-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 border border-cyan-400/40">
+                <span class="font-mono font-black text-white text-base">Æ</span>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="font-extrabold text-sm tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-sky-200 to-indigo-400">AETHERIS</span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded font-mono font-bold bg-cyan-950 text-cyan-400 border border-cyan-800/50">v1.0-ENTERPRISE</span>
+                </div>
+                <div class="text-[11px] text-slate-400 hidden sm:block">Unified Adaptive Security Platform</div>
+            </div>
+        </div>
+
+        <!-- Perspective View Switcher -->
+        <div class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800 shadow-inner">
+            <button id="btn-mode-analyst" onclick="switchPerspective('analyst')" class="view-mode-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all">
+                <span>🛡️</span> <span>SOC Analyst</span>
+            </button>
+            <button id="btn-mode-personal" onclick="switchPerspective('personal')" class="view-mode-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all">
+                <span>👤</span> <span>Personal Security</span>
+            </button>
+            <button id="btn-mode-executive" onclick="switchPerspective('executive')" class="view-mode-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all">
+                <span>📈</span> <span>CISO Executive</span>
+            </button>
+        </div>
+
+        <!-- Right System Indicators & AI Trigger -->
+        <div class="flex items-center gap-3">
+            <!-- WebSocket Live Indicator -->
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800">
+                <span id="ws-status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-emerald"></span>
+                <span id="ws-status-label" class="text-xs font-mono font-medium text-emerald-400">TELEMETRY LIVE</span>
+            </div>
+
+            <!-- AI Security Copilot Button -->
+            <button onclick="toggleAICopilot()" class="px-3.5 py-1.5 rounded-lg bg-indigo-600/90 hover:bg-indigo-500 text-white border border-indigo-400/30 text-xs font-semibold flex items-center gap-2 shadow-lg shadow-indigo-500/20 transition-all">
+                <span>🤖</span>
+                <span class="hidden md:inline">AI Copilot</span>
+                <span class="px-1.5 py-0.2 rounded text-[10px] font-mono bg-indigo-950 text-indigo-300">GUARDRAILED</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Global Executive Metric Strip -->
+    <section class="border-b border-slate-800/60 bg-slate-950/40 px-6 py-3">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+            <div class="px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-800/80">
+                <div class="text-[10px] uppercase font-mono text-slate-400">Security Health</div>
+                <div id="kpi-health-score" class="text-lg font-bold text-emerald-400 font-mono">84%</div>
+            </div>
+            <div class="px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-800/80">
+                <div class="text-[10px] uppercase font-mono text-slate-400">Active Incidents</div>
+                <div id="kpi-active-incidents" class="text-lg font-bold text-rose-400 font-mono">1</div>
+            </div>
+            <div class="px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-800/80">
+                <div class="text-[10px] uppercase font-mono text-slate-400">Mean Time to Detect</div>
+                <div id="kpi-mttd" class="text-lg font-bold text-cyan-400 font-mono">3.8m</div>
+            </div>
+            <div class="px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-800/80">
+                <div class="text-[10px] uppercase font-mono text-slate-400">Mean Time to Respond</div>
+                <div id="kpi-mttr" class="text-lg font-bold text-indigo-400 font-mono">11.4m</div>
+            </div>
+            <div class="px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-800/80">
+                <div class="text-[10px] uppercase font-mono text-slate-400">Events Ingested</div>
+                <div id="kpi-events" class="text-lg font-bold text-slate-200 font-mono">158,200</div>
+            </div>
+            <div class="px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-800/80">
+                <div class="text-[10px] uppercase font-mono text-slate-400">Critical Alerts (24h)</div>
+                <div id="kpi-critical-alerts" class="text-lg font-bold text-amber-400 font-mono">3</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Dynamic Container -->
+    <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
+
+        <!-- ================= VIEW 1: SOC ANALYST PERSPECTIVE ================= -->
+        <div id="view-analyst" class="space-y-6">
+            
+            <!-- Live Attack Scenario Simulator Banner -->
+            <div class="p-4 rounded-xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-indigo-950/40 border border-cyan-500/30 shadow-lg">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-mono font-bold text-cyan-400">⚔️ LIVE ATTACK BENCHMARK SIMULATOR</span>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">REPRODUCIBLE WORKLOADS</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">
+                            Trigger real-time multi-stage kill chains to observe ingestion, normalizer, rule detection, UEBA anomaly, entity graph mutation, and incident generation.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="triggerAttackScenario('CREDENTIAL_STUFFING')" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-all">
+                            Scenario 1: Credential Stuffing & Takeover
+                        </button>
+                        <button onclick="triggerAttackScenario('RANSOMWARE_DEFENSE')" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-all">
+                            Scenario 2: Ransomware EDR Defense
+                        </button>
+                        <button onclick="triggerAttackScenario('EXFILTRATION')" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-all">
+                            Scenario 3: Rapid Data Exfiltration
+                        </button>
+                    </div>
+                </div>
+                <!-- Active Simulation Progress Ticker -->
+                <div id="sim-active-banner" class="hidden mt-3 pt-3 border-t border-slate-800/80 flex items-center gap-3 text-xs text-cyan-300 font-mono">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                    <span>RUNNING ATTACK SIMULATION: <strong id="sim-active-name" class="text-white"></strong>. Telemetry streaming to SIEM...</span>
+                </div>
+            </div>
+
+            <!-- Two-Column Operational Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- Left Column (SIEM Search & Live Stream) - 7 cols -->
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="p-4 rounded-xl glass-panel">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wider font-mono">SIEM Telemetry Stream</h3>
+                                <span id="live-stream-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 transition-colors">REAL-TIME</span>
+                            </div>
+                            <span id="siem-total-count" class="text-xs font-mono text-slate-400">Loading events...</span>
+                        </div>
+
+                        <!-- Search & Quick Filters -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 mb-3">
+                            <div class="sm:col-span-6">
+                                <input id="siem-search-input" onkeyup="if(event.key==='Enter') loadSIEMEvents()" type="text" placeholder="Search actor, destination, IP, or raw payload..." class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 font-mono">
+                            </div>
+                            <div class="sm:col-span-3">
+                                <select id="siem-filter-severity" onchange="loadSIEMEvents()" class="w-full px-2.5 py-2 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300 focus:outline-none focus:border-cyan-500 font-mono">
+                                    <option value="">All Severities</option>
+                                    <option value="CRITICAL">Critical</option>
+                                    <option value="HIGH">High</option>
+                                    <option value="MEDIUM">Medium</option>
+                                    <option value="LOW">Low</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-3">
+                                <select id="siem-filter-type" onchange="loadSIEMEvents()" class="w-full px-2.5 py-2 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300 focus:outline-none focus:border-cyan-500 font-mono">
+                                    <option value="">All Event Types</option>
+                                    <option value="authentication">Authentication</option>
+                                    <option value="network">Network</option>
+                                    <option value="process">Process / EDR</option>
+                                    <option value="file">File Activity</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Live Events Table -->
+                        <div class="overflow-x-auto max-h-[580px] overflow-y-auto rounded-lg border border-slate-800/80 bg-slate-950/60">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-800 bg-slate-900/80 text-[10px] font-mono text-slate-400 uppercase tracking-wider sticky top-0 z-10 backdrop-blur-md">
+                                        <th class="py-2.5 px-3">Time (UTC)</th>
+                                        <th class="py-2.5 px-3">Severity</th>
+                                        <th class="py-2.5 px-3">Actor</th>
+                                        <th class="py-2.5 px-3">Action</th>
+                                        <th class="py-2.5 px-3">Source IP</th>
+                                        <th class="py-2.5 px-3">Target</th>
+                                        <th class="py-2.5 px-3 text-right">Vendor</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="siem-events-tbody" class="divide-y divide-slate-800/40">
+                                    <!-- Injected dynamically via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (Entity Graph & Incidents) - 5 cols -->
+                <div class="lg:col-span-5 space-y-4">
+
+                    <!-- Attack & Entity Graph Panel -->
+                    <div class="p-4 rounded-xl glass-panel">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wider font-mono">Attack & Entity Graph</h3>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">INTERACTIVE</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400">Click node to inspect</span>
+                        </div>
+
+                        <!-- Vis.js Canvas Container -->
+                        <div class="relative">
+                            <div id="network-graph-canvas" class="border border-slate-800/80"></div>
+                            <!-- Blast Radius Result Card -->
+                            <div id="graph-node-details" class="mt-3"></div>
+                        </div>
+                    </div>
+
+                    <!-- Active Incidents & SOAR Panel -->
+                    <div class="p-4 rounded-xl glass-panel">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wider font-mono">Active Incidents & SOAR</h3>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800">AUTOMATED TRIAGE</span>
+                            </div>
+                            <button onclick="loadIncidents()" class="text-xs text-cyan-400 hover:text-cyan-300">Refresh</button>
+                        </div>
+                        <div id="incidents-list-container" class="max-h-[380px] overflow-y-auto pr-1">
+                            <!-- Injected dynamically via JS -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ================= VIEW 2: PERSONAL SECURITY PERSPECTIVE ================= -->
+        <div id="view-personal" class="hidden space-y-6">
+            
+            <!-- Hero Personal Health Card -->
+            <div class="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+                <div>
+                    <span class="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider">Personal Security Center</span>
+                    <h2 class="text-2xl font-bold text-slate-100 mt-1">Darsh's Security Health</h2>
+                    <p class="text-sm text-slate-400 mt-1.5 max-w-xl">
+                        Aetheris protects your personal accounts, home devices, and online identity using the same enterprise-grade risk algorithms.
+                    </p>
+                </div>
+                <div class="flex items-center gap-4 bg-slate-950/80 p-4 rounded-xl border border-slate-800">
+                    <div class="text-right">
+                        <div class="text-xs text-slate-400">Security Score</div>
+                        <div class="text-xs text-emerald-400 font-semibold">Good Posture</div>
+                    </div>
+                    <div id="personal-health-score" class="text-4xl font-extrabold text-cyan-400 font-mono">84%</div>
+                </div>
+            </div>
+
+            <!-- Action Items & Exposures -->
+            <div class="p-5 rounded-xl glass-panel">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wider font-mono">Action Items Requiring Attention</h3>
+                        <p class="text-xs text-slate-400">Leaked credentials, risky third-party app permissions, or device warnings.</p>
+                    </div>
+                </div>
+                <div id="personal-exposures-container">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+
+            <!-- Connected Personal Devices -->
+            <div class="p-5 rounded-xl glass-panel">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wider font-mono">Personal Devices Protected</h3>
+                        <p class="text-xs text-slate-400">Continuous telemetry and patch compliance for home endpoints.</p>
+                    </div>
+                </div>
+                <div id="personal-devices-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= VIEW 3: CISO / EXECUTIVE PERSPECTIVE ================= -->
+        <div id="view-executive" class="hidden space-y-6">
+
+            <!-- Executive Posture Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Compliance Gauges -->
+                <div class="p-5 rounded-xl glass-panel md:col-span-1">
+                    <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wider font-mono mb-4">Compliance Audit Readiness</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300">NIST CSF 2.0</span>
+                                <span class="font-mono text-emerald-400 font-bold">92%</span>
+                            </div>
+                            <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                <div class="h-full bg-emerald-500 rounded-full" style="width: 92%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300">ISO/IEC 27001:2022</span>
+                                <span class="font-mono text-cyan-400 font-bold">89%</span>
+                            </div>
+                            <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                <div class="h-full bg-cyan-500 rounded-full" style="width: 89%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300">SOC 2 Type II Controls</span>
+                                <span class="font-mono text-indigo-400 font-bold">95%</span>
+                            </div>
+                            <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                <div class="h-full bg-indigo-500 rounded-full" style="width: 95%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 30-Day Risk Trajectory Chart -->
+                <div class="p-5 rounded-xl glass-panel md:col-span-2">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wider font-mono">30-Day Risk Trajectory & Alert Spikes</h3>
+                        <span class="text-xs text-slate-400 font-mono">Chart.js Engine</span>
+                    </div>
+                    <div class="h-56">
+                        <canvas id="ciso-risk-trend-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crown Jewel & High Risk Assets Matrix -->
+            <div class="p-5 rounded-xl glass-panel">
+                <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wider font-mono mb-3">Crown Jewel Assets & High-Risk Identities</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-800 font-mono text-slate-400 uppercase">
+                                <th class="py-2.5 px-3">Asset / Identity</th>
+                                <th class="py-2.5 px-3">Classification</th>
+                                <th class="py-2.5 px-3">Risk Index</th>
+                                <th class="py-2.5 px-3">Primary Risk Factor</th>
+                                <th class="py-2.5 px-3">Containment Readiness</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            <tr>
+                                <td class="py-3 px-3 font-semibold text-slate-200">Elena Rostova (VP Finance)</td>
+                                <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono text-[10px]">VIP Executive</span></td>
+                                <td class="py-3 px-3 font-mono font-bold text-rose-400">78.0 / 100</td>
+                                <td class="py-3 px-3 text-slate-300">Impossible travel from New York to Moscow within 14 min</td>
+                                <td class="py-3 px-3 text-amber-400">⚠️ Actions Pending Approval</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-3 font-semibold text-slate-200">UNKNOWN-HOST-X99 (185.220.101.44)</td>
+                                <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-mono text-[10px]">Rogue Endpoint</span></td>
+                                <td class="py-3 px-3 font-mono font-bold text-rose-400">94.0 / 100</td>
+                                <td class="py-3 px-3 text-slate-300">Unmanaged Kali Linux device accessing NetSuite ERP</td>
+                                <td class="py-3 px-3 text-rose-400">⚡ Isolation Recommended</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-3 font-semibold text-slate-200">Okta Identity Cloud</td>
+                                <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono text-[10px]">Tier-0 IDP</span></td>
+                                <td class="py-3 px-3 font-mono font-bold text-emerald-400">15.0 / 100</td>
+                                <td class="py-3 px-3 text-slate-300">Hardware token MFA enforced on 94% of users</td>
+                                <td class="py-3 px-3 text-emerald-400">✓ Healthy</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- ================= SLIDE-OVER AI COPILOT DRAWER ================= -->
+    <div id="ai-copilot-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[460px] bg-slate-950/95 backdrop-blur-xl border-l border-slate-800 z-50 transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+        <!-- Drawer Header -->
+        <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+                    🤖
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-100 flex items-center gap-1.5">
+                        Aetheris AI Copilot
+                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">GUARDRAILED</span>
+                    </h3>
+                    <p class="text-[11px] text-slate-400">Strict Read/Write Separation • Human Approval Enforced</p>
+                </div>
+            </div>
+            <button onclick="toggleAICopilot(false)" class="text-slate-400 hover:text-white p-1 rounded-lg">✕</button>
+        </div>
+
+        <!-- Suggested Prompt Chips -->
+        <div class="p-3 border-b border-slate-800/80 bg-slate-900/30 flex flex-wrap gap-1.5 text-[11px]">
+            <button onclick="submitAICopilotMessage('Why is Elena Rostova high risk?')" class="px-2.5 py-1 rounded-full bg-slate-800/80 hover:bg-slate-700 text-cyan-300 border border-cyan-800/40 transition-all">
+                💡 Why is Elena high risk?
+            </button>
+            <button onclick="submitAICopilotMessage('Investigate the active incident and show blast radius')" class="px-2.5 py-1 rounded-full bg-slate-800/80 hover:bg-slate-700 text-cyan-300 border border-cyan-800/40 transition-all">
+                🔍 Investigate active incident
+            </button>
+            <button onclick="submitAICopilotMessage('Isolate rogue host 185.220.101.44')" class="px-2.5 py-1 rounded-full bg-slate-800/80 hover:bg-slate-700 text-rose-300 border border-rose-800/40 transition-all">
+                🛡️ Isolate rogue host
+            </button>
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div id="ai-chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3">
+            <div class="flex items-start mb-4">
+                <div class="max-w-[85%] rounded-2xl rounded-bl-none p-4 bg-slate-900 border border-slate-800 text-slate-200 text-xs leading-relaxed shadow-md">
+                    👋 Hello Marcus. I am your <strong>Aetheris AI Security Copilot</strong>. I have grounded access to the SIEM event pipeline, UEBA anomaly models, the live entity relationship graph, and SOAR containment playbooks.
+                    <br><br>
+                    Ask me any investigation question, or click one of the suggested prompts above.
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Input Footer -->
+        <div class="p-3 border-t border-slate-800 bg-slate-900/80">
+            <div class="flex items-center gap-2">
+                <input id="ai-chat-input" onkeyup="if(event.key==='Enter') submitAICopilotMessage()" type="text" placeholder="Ask AI Copilot to investigate, correlate, or plan response..." class="flex-1 px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 font-mono">
+                <button onclick="submitAICopilotMessage()" class="px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-md transition-all">
+                    Send
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= INCIDENT DRILL-DOWN MODAL ================= -->
+    <div id="incident-details-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+                <div class="flex items-center gap-3">
+                    <span id="inc-modal-severity" class="px-2.5 py-1 rounded text-xs font-mono font-bold badge-critical">CRITICAL</span>
+                    <h3 id="inc-modal-id" class="text-sm font-mono font-bold text-cyan-400">INC-CRIT-901</h3>
+                </div>
+                <button onclick="closeIncidentModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto space-y-5 flex-1">
+                <div>
+                    <h2 id="inc-modal-title" class="text-lg font-bold text-slate-100">Multi-Stage Account Takeover</h2>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="text-xs text-slate-400">Current Status:</span>
+                        <span id="inc-modal-status" class="px-2 py-0.5 rounded text-xs font-mono bg-cyan-500/20 text-cyan-300">INVESTIGATING</span>
+                    </div>
+                </div>
+
+                <!-- AI Forensic Summary -->
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+                    <div class="text-xs font-mono text-cyan-400 font-semibold mb-1">🤖 AI Copilot Synthesis</div>
+                    <p id="inc-modal-summary" class="text-xs text-slate-300 leading-relaxed"></p>
+                </div>
+
+                <!-- Correlated Timeline -->
+                <div>
+                    <h4 class="text-xs font-mono uppercase text-slate-400 mb-3 tracking-wider">Attack Kill-Chain Timeline</h4>
+                    <ul id="inc-modal-timeline" class="space-y-1"></ul>
+                </div>
+
+                <!-- Containment Playbook Actions -->
+                <div>
+                    <h4 class="text-xs font-mono uppercase text-slate-400 mb-2 tracking-wider">SOAR Containment Playbooks</h4>
+                    <div id="inc-modal-actions"></div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-slate-800 bg-slate-900/60 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <button onclick="transitionIncidentStatus('CONTAINMENT')" class="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold">
+                        Move to Containment
+                    </button>
+                    <button onclick="transitionIncidentStatus('CLOSED')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">
+                        Close Incident
+                    </button>
+                </div>
+                <button onclick="closeIncidentModal()" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= CEM RAW EVENT INSPECTOR MODAL ================= -->
+    <div id="event-inspector-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono text-cyan-400 font-bold">COMMON EVENT MODEL (CEM) INSPECTOR</span>
+                    <span id="modal-event-id" class="text-xs font-mono text-slate-400"></span>
+                </div>
+                <button onclick="closeEventModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+            </div>
+            <div class="p-5 overflow-y-auto space-y-4 font-mono text-xs flex-1">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="p-3 rounded-lg bg-slate-900 border border-slate-800">
+                        <div class="text-[10px] text-slate-500 uppercase">Event Action</div>
+                        <div id="modal-event-type" class="text-slate-200 mt-0.5"></div>
+                    </div>
+                    <div class="p-3 rounded-lg bg-slate-900 border border-slate-800">
+                        <div class="text-[10px] text-slate-500 uppercase">Severity</div>
+                        <div id="modal-event-severity" class="text-rose-400 font-bold mt-0.5"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-xs font-semibold text-slate-300 mb-1">Actor & Identity Context</div>
+                    <pre id="modal-event-actor" class="p-3 rounded-lg bg-slate-900/90 border border-slate-800 text-[11px] text-slate-300 overflow-x-auto"></pre>
+                </div>
+
+                <div>
+                    <div class="text-xs font-semibold text-slate-300 mb-1">Source & Device Context</div>
+                    <pre id="modal-event-source" class="p-3 rounded-lg bg-slate-900/90 border border-slate-800 text-[11px] text-slate-300 overflow-x-auto"></pre>
+                </div>
+
+                <div>
+                    <div class="text-xs font-semibold text-slate-300 mb-1">Full Normalized OCSF JSON</div>
+                    <pre id="modal-event-json" class="p-3 rounded-lg bg-slate-900/90 border border-slate-800 text-[11px] text-cyan-300 overflow-x-auto max-h-60"></pre>
+                </div>
+            </div>
+            <div class="p-3 border-t border-slate-800 bg-slate-900/60 text-right">
+                <button onclick="closeEventModal()" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">
+                    Close Inspector
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Scripts -->
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/siem.js"></script>
+    <script src="/static/js/graph.js"></script>
+    <script src="/static/js/incidents.js"></script>
+    <script src="/static/js/ai_copilot.js"></script>
+    <script src="/static/js/simulations.js"></script>
+    <script src="/static/js/views_extra.js"></script>
+</body>
+</html>
